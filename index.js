@@ -18,9 +18,17 @@ const io = new Server(server, {
 app.get("/", (req, res) => {
   res.sendFile("index.html");
 });
-
+let messages = [];
 io.on("connection", (socket) => {
   console.log(socket.id);
+  socket.on("join_room", (data) => {
+    socket.join(data.roomName);
+  });
+  socket.on("send_message", (data) => {
+    messages.push(data.message);
+    console.log(data);
+    socket.to(data.roomName).emit("recieve_message", messages);
+  });
   socket.on("disconnect", () => {
     console.log("user has left chat");
   });
